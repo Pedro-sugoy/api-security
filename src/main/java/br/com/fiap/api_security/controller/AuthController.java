@@ -1,9 +1,11 @@
 package br.com.fiap.api_security.controller;
 
 import br.com.fiap.api_security.dto.AuthDTO;
+import br.com.fiap.api_security.dto.LoginResponseDTO;
 import br.com.fiap.api_security.dto.RegisterDTO;
 import br.com.fiap.api_security.entity.Usuario;
 import br.com.fiap.api_security.repository.UsuarioRepository;
+import br.com.fiap.api_security.service.TokenService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +22,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final AuthenticationManager autenticatortionManager;
     private final UsuarioRepository usuarioRepository;
+    private TokenService tokenService;
 
     @Autowired
     public AuthController(AuthenticationManager autenticatortionManager,
-                          UsuarioRepository usuarioRepository) {
+                          UsuarioRepository usuarioRepository,
+                          TokenService tokenService) {
         this.autenticatortionManager = autenticatortionManager;
         this.usuarioRepository = usuarioRepository;
+        this.tokenService = tokenService;
     }
 
     @PostMapping("/login")
@@ -37,7 +42,8 @@ public class AuthController {
         );
         //Autentica o token
         var auth = this.autenticatortionManager.authenticate(userPwd);
-        return ResponseEntity.ok().build();
+        var token = tokenService.generateToken((Usuario) auth.getPrincipal());
+        return ResponseEntity.ok(token);
     }
 
     @PostMapping("/register")
