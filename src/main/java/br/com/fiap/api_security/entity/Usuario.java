@@ -69,4 +69,8 @@ public class Usuario implements UserDetails {
         this.senha = senha;
         this.role = role;
     }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
 }
